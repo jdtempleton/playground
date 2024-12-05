@@ -1,0 +1,14 @@
+{
+	"default": {
+		"formatOptions": {
+			"snippetInterface": "async-await"
+		},
+		"paths": [
+			"e2e/features/"
+		],
+		"import": [
+			"e2e/steps/**/*.ts"
+		],
+		"loader": ["ts-node/esm"]
+	}
+}
