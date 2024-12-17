@@ -1,0 +1,35 @@
+name: Increment package.json version when new release branch is created.
+
+on:
+  create:
+    branches: [release/v**]
+
+jobs:
+  increment-version:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository...
+        uses: actions/checkout@v4
+
+      - name: Determine the new release version based on the create release branch...
+        run: echo "NEW_RELEASE_VERSION=$(git branch --show-current | awk -F'/v' '{print $2}')" >> $GITHUB_ENV
+
+      - name: Setup Node...
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: Increment the package version...
+        run: npm version --git-tag-version false ${{ env.NEW_RELEASE_VERSION }}
+
+      - name: Configure `git` and add, commit, and push the changes to {package.json,package-lock.json}...
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com>"
+          git add package.json package-lock.json
+          git commit -m "Increment version to ${{ env.NEW_RELEASE_VERSION }}"
+          git push
